@@ -1,0 +1,45 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Open-Meteo via Tyk",
+    "version": "1.0.0",
+    "description": "The two Open-Meteo operations as they are exposed by the Tyk REST gateway (/weather/forecast, /air/air-quality). Fed to @tyk-technologies/api-to-mcp so each becomes an MCP tool; tool calls are routed through Tyk (targetUrl = the Tyk gateway), so the MCP surface inherits Tyk's governance."
+  },
+  "servers": [
+    { "url": "http://tyk-gateway:8080" }
+  ],
+  "paths": {
+    "/weather/forecast": {
+      "get": {
+        "operationId": "getWeatherForecast",
+        "summary": "Weather forecast for a coordinate (via Tyk)",
+        "description": "Current/hourly/daily weather for a latitude/longitude. Proxied by Tyk to api.open-meteo.com/v1/forecast.",
+        "parameters": [
+          { "name": "latitude", "in": "query", "required": true, "schema": { "type": "number" }, "description": "Latitude in decimal degrees." },
+          { "name": "longitude", "in": "query", "required": true, "schema": { "type": "number" }, "description": "Longitude in decimal degrees." },
+          { "name": "current", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Comma-separated current variables, e.g. temperature_2m,weather_code." },
+          { "name": "hourly", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Comma-separated hourly variables." },
+          { "name": "daily", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Comma-separated daily variables." },
+          { "name": "forecast_days", "in": "query", "required": false, "schema": { "type": "integer", "minimum": 1, "maximum": 16 }, "description": "Number of forecast days." },
+          { "name": "timezone", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Timezone, e.g. auto or America/New_York." }
+        ],
+        "responses": { "200": { "description": "Forecast JSON" } }
+      }
+    },
+    "/air/air-quality": {
+      "get": {
+        "operationId": "getAirQuality",
+        "summary": "Air quality for a coordinate (via Tyk)",
+        "description": "Current/hourly air quality for a latitude/longitude. Proxied by Tyk to air-quality-api.open-meteo.com/v1/air-quality.",
+        "parameters": [
+          { "name": "latitude", "in": "query", "required": true, "schema": { "type": "number" }, "description": "Latitude in decimal degrees." },
+          { "name": "longitude", "in": "query", "required": true, "schema": { "type": "number" }, "description": "Longitude in decimal degrees." },
+          { "name": "current", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Comma-separated current variables, e.g. european_aqi,pm2_5." },
+          { "name": "hourly", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Comma-separated hourly variables." },
+          { "name": "timezone", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Timezone, e.g. auto." }
+        ],
+        "responses": { "200": { "description": "Air quality JSON" } }
+      }
+    }
+  }
+}

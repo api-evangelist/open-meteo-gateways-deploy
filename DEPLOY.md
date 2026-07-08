@@ -5,7 +5,7 @@ host behind Caddy. This is the source of truth for what serves:
 
 | Subdomain | Gateway | Surface |
 |---|---|---|
-| `weather-tyk.apievangelist.com` | Tyk OAS | REST — `/weather/forecast`, `/air/air-quality` |
+| `weather-tyk.apievangelist.com` | Tyk OAS | REST — `/weather/forecast`, `/air/air-quality`; **MCP** — `/mcp` (api-to-mcp via supergateway bridge, tools routed through Tyk) |
 | `weather-krakend.apievangelist.com` | KrakenD | REST — `/weather`, `/air-quality`, `/conditions` (merge) |
 | `weather-agentgateway.apievangelist.com` | agentgateway | MCP-only — `POST /mcp` |
 

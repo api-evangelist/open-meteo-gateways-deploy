@@ -8,13 +8,21 @@
 	email kinlane@gmail.com
 }
 
-# ---- Tyk (REST) ----
+# ---- Tyk (REST + MCP) ----
 weather-tyk.apievangelist.com {
+	# MCP endpoint (api-to-mcp via supergateway bridge). Streamable HTTP; Caddy
+	# streams text/event-stream and passes the Mcp-Session-Id header through.
+	@mcp path /mcp /mcp/*
+	handle @mcp {
+		reverse_proxy tyk-mcp:8000
+	}
+	# Landing page at the bare domain.
 	root * /srv/tyk
 	@landing path / /index.html
 	handle @landing {
 		file_server
 	}
+	# Everything else is the Tyk REST gateway.
 	handle {
 		reverse_proxy tyk-gateway:8080
 	}

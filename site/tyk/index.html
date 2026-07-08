@@ -41,6 +41,18 @@ curl "https://weather-tyk.apievangelist.com/air/air-quality?latitude=40.7128&amp
 
   <p>Adds CORS, ~5&nbsp;min caching, and request validation (missing <code>latitude</code>/<code>longitude</code> → <code>422</code>) over the raw upstreams.</p>
 
+  <h2 style="font-size:1.1rem;margin-top:2rem;">MCP endpoint</h2>
+  <p>The same two operations are also exposed as an <strong>MCP</strong> server via Tyk's
+     <a href="https://github.com/TykTechnologies/api-to-mcp">api-to-mcp</a> (OpenAPI→MCP), served over
+     Streamable HTTP. MCP tool calls are routed <em>through the Tyk REST gateway</em>, so they inherit the
+     same governance.</p>
+  <table>
+    <tr><th>MCP endpoint</th><td><code>POST https://weather-tyk.apievangelist.com/mcp</code></td></tr>
+    <tr><th>Tools</th><td><code>getWeatherForecast</code>, <code>getAirQuality</code></td></tr>
+  </table>
+  <pre>npx @modelcontextprotocol/inspector
+# connect to: https://weather-tyk.apievangelist.com/mcp</pre>
+
   <footer>Source: <a href="https://github.com/api-evangelist/open-meteo-tyk-demo">api-evangelist/open-meteo-tyk-demo</a> ·
   part of <a href="https://apievangelist.com/2026/07/01/the-consumer-decides-the-gateway/">The Consumer Decides the Gateway</a></footer>
 </body>

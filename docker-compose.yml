@@ -61,6 +61,19 @@ services:
       - ../open-meteo-agentgateway:/config:ro
     command: ["-f", "/config/config.yaml"]
 
+  # ---- Tyk MCP: api-to-mcp (OpenAPI->MCP) behind a stdio->HTTP bridge ----
+  # Serves Streamable HTTP MCP at /mcp for the weather-tyk subdomain. Tool calls
+  # target the Tyk REST gateway, so the MCP surface is governed by Tyk too.
+  tyk-mcp:
+    build: ./tyk-mcp
+    image: open-meteo-tyk-mcp
+    container_name: open-meteo-tyk-mcp
+    restart: unless-stopped
+    volumes:
+      - ./tyk-mcp/openapi.json:/config/openapi.json:ro
+    depends_on:
+      - tyk-gateway
+
   # ---- Caddy: TLS termination + host-based routing + root landing pages ----
   caddy:
     image: caddy:2
@@ -79,6 +92,7 @@ services:
       - tyk-gateway
       - krakend
       - agentgateway
+      - tyk-mcp
 
 volumes:
   tyk-redis-data:
