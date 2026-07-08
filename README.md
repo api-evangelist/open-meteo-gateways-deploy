@@ -10,7 +10,7 @@ host that `weather-tyk` / `weather-krakend` / `weather-agentgateway.apievangelis
 ./bootstrap.sh     # clone the 3 sibling repos + docker compose up -d
 ```
 
-Full runbook: **[DEPLOY.md](DEPLOY.md)**.
+Full runbook: **[DEPLOY.md](DEPLOY.md)**. First boot is unattended via [`cloud-init.sh`](cloud-init.sh) (EC2 user-data).
 
 Part of *[The Consumer Decides the Gateway](https://apievangelist.com/2026/07/01/the-consumer-decides-the-gateway/)* —
 same two keyless [Open-Meteo](https://open-meteo.com) upstreams, three gateways, one host.

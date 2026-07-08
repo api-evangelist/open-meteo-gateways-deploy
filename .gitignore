@@ -1,2 +1,4 @@
 .DS_Store
 *.log
+# Local-only: contains AWS instance/EIP/SG/VPC IDs — not for the public repo.
+HOST.md
