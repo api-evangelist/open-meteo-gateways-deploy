@@ -74,8 +74,10 @@ docker compose up -d --force-recreate krakend
 To change routing or a landing page, edit [`Caddyfile`](Caddyfile) / [`site/`](site/) here, then:
 
 ```bash
-docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile   # zero-downtime
-# or: docker compose up -d --force-recreate caddy
+docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile   # zero-downtime, if you edited in place
+# after a `git pull` that REPLACES Caddyfile, reload is NOT enough — the single-file
+# bind mount pins the old inode, so recreate to remount the new file:
+docker compose up -d --force-recreate caddy
 ```
 
 ## Verify
@@ -83,6 +85,8 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile   # zero-do
 ```bash
 # Tyk (REST)
 curl -s "https://weather-tyk.apievangelist.com/weather/forecast?latitude=40.7128&longitude=-74.006&current=temperature_2m&timezone=auto"
+# Tyk (MCP) — api-to-mcp via supergateway bridge, tools routed through Tyk
+npx @modelcontextprotocol/inspector   # connect to https://weather-tyk.apievangelist.com/mcp
 # KrakenD (declarative merge)
 curl -s "https://weather-krakend.apievangelist.com/conditions?latitude=40.7128&longitude=-74.006"
 # agentgateway (MCP) — landing page at /, MCP handshake at /mcp
