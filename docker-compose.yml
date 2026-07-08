@@ -1,0 +1,86 @@
+# Open-Meteo gateways — single-host deploy
+#
+# Runs all three gateway demos behind one Caddy reverse proxy (auto-TLS via
+# Let's Encrypt), each on its own subdomain. This is what runs on the AWS host
+# that weather-tyk / weather-krakend / weather-agentgateway.apievangelist.com
+# point at.
+#
+# Config is mounted live from the three sibling repos (clone them next to this
+# one — see DEPLOY.md / bootstrap.sh), so there is ONE source of truth per demo.
+#
+#   weather-tyk.apievangelist.com          -> tyk-gateway:8080   (REST)
+#   weather-krakend.apievangelist.com      -> krakend:8080       (REST + merge)
+#   weather-agentgateway.apievangelist.com -> agentgateway:3000  (MCP)
+#
+# Gateways are NOT published to host ports — only Caddy binds 80/443. They talk
+# to Caddy over the internal compose network by service name.
+
+name: open-meteo-gateways
+
+services:
+  # ---- Tyk (REST): /weather/forecast, /air/air-quality ----
+  tyk-redis:
+    image: redis:7.2-alpine
+    container_name: tyk-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - tyk-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  tyk-gateway:
+    image: tykio/tyk-gateway:v5.6.0
+    container_name: tyk-gateway
+    restart: unless-stopped
+    volumes:
+      - ../open-meteo-tyk-demo/tyk/tyk.standalone.conf:/opt/tyk-gateway/tyk.conf:ro
+      - ../open-meteo-tyk-demo/tyk/apps:/opt/tyk-gateway/apps:ro
+    depends_on:
+      tyk-redis:
+        condition: service_healthy
+
+  # ---- KrakenD (REST): /weather, /air-quality, /conditions (declarative merge) ----
+  krakend:
+    image: devopsfaith/krakend:2.7
+    container_name: open-meteo-krakend
+    restart: unless-stopped
+    volumes:
+      - ../open-meteo-krakend/krakend.json:/etc/krakend/krakend.json:ro
+    command: ["run", "-c", "/etc/krakend/krakend.json"]
+
+  # ---- agentgateway (MCP-only): /mcp ----
+  agentgateway:
+    image: ghcr.io/agentgateway/agentgateway:latest
+    container_name: open-meteo-agentgateway
+    restart: unless-stopped
+    volumes:
+      - ../open-meteo-agentgateway:/config:ro
+    command: ["-f", "/config/config.yaml"]
+
+  # ---- Caddy: TLS termination + host-based routing + root landing pages ----
+  caddy:
+    image: caddy:2
+    container_name: open-meteo-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - tyk-gateway
+      - krakend
+      - agentgateway
+
+volumes:
+  tyk-redis-data:
+  caddy-data:
+  caddy-config:

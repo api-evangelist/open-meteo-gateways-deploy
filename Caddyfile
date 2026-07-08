@@ -1,0 +1,48 @@
+# Open-Meteo gateways — Caddy reverse proxy
+#
+# Auto-TLS via Let's Encrypt for each subdomain. Each site serves a static
+# landing page at "/" (so the bare domain is informative, not a 404) and
+# proxies everything else to the gateway container on the compose network.
+
+{
+	email kinlane@gmail.com
+}
+
+# ---- Tyk (REST) ----
+weather-tyk.apievangelist.com {
+	root * /srv/tyk
+	@landing path / /index.html
+	handle @landing {
+		file_server
+	}
+	handle {
+		reverse_proxy tyk-gateway:8080
+	}
+}
+
+# ---- KrakenD (REST + declarative merge) ----
+weather-krakend.apievangelist.com {
+	root * /srv/krakend
+	@landing path / /index.html
+	handle @landing {
+		file_server
+	}
+	handle {
+		reverse_proxy krakend:8080
+	}
+}
+
+# ---- agentgateway (MCP-only) ----
+# "/" gets a landing page; /mcp, /sse and everything else go to agentgateway.
+# reverse_proxy streams text/event-stream responses and passes the
+# mcp-session-id header through unchanged.
+weather-agentgateway.apievangelist.com {
+	root * /srv/agentgateway
+	@landing path / /index.html
+	handle @landing {
+		file_server
+	}
+	handle {
+		reverse_proxy agentgateway:3000
+	}
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open-Meteo × agentgateway — MCP gateway demo</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 -apple-system, system-ui, sans-serif; max-width: 760px;
+         margin: 3rem auto; padding: 0 1.25rem; }
+  h1 { font-size: 1.55rem; margin-bottom: .25rem; }
+  .tag { display:inline-block; font-size:.75rem; letter-spacing:.04em; text-transform:uppercase;
+         padding:.15rem .5rem; border:1px solid currentColor; border-radius:1rem; opacity:.7; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  pre { background: color-mix(in srgb, currentColor 8%, transparent); padding: .9rem 1rem;
+        border-radius: 8px; overflow-x: auto; font-size: .85rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent); }
+  a { color: #3098d8; }
+  .note { background: color-mix(in srgb, #3098d8 12%, transparent); padding: .75rem 1rem;
+          border-radius: 8px; font-size: .9rem; }
+  footer { margin-top: 2.5rem; font-size: .85rem; opacity: .7; }
+</style>
+</head>
+<body>
+  <span class="tag">agentgateway · MCP gateway</span>
+  <h1>Open-Meteo × agentgateway</h1>
+  <p><a href="https://agentgateway.dev">agentgateway</a> turns the two free, keyless
+     <a href="https://open-meteo.com">Open-Meteo</a> REST APIs into <strong>one federated MCP server</strong>.
+     Each OpenAPI operation becomes an MCP tool; the two targets are multiplexed into a single tool list.
+     One of three gateways over the same upstreams — see also
+     <a href="https://weather-tyk.apievangelist.com/">Tyk</a> and
+     <a href="https://weather-krakend.apievangelist.com/">KrakenD</a>.</p>
+
+  <p class="note">This is <strong>MCP, not REST</strong> — the consumer is an AI agent. There is no REST
+     surface here. Point an MCP client at the endpoint below (a plain browser <code>GET /</code> only
+     reaches this page).</p>
+
+  <table>
+    <tr><th>MCP endpoint</th><td><code>POST https://weather-agentgateway.apievangelist.com/mcp</code> (Streamable HTTP)</td></tr>
+    <tr><th>Tools</th><td><code>weather_getWeatherForecast</code>, <code>airquality_getAirQuality</code></td></tr>
+  </table>
+
+  <p>Try it with MCP Inspector:</p>
+  <pre>npx @modelcontextprotocol/inspector
+# then connect to: https://weather-agentgateway.apievangelist.com/mcp</pre>
+
+  <footer>Source: <a href="https://github.com/api-evangelist/open-meteo-agentgateway">api-evangelist/open-meteo-agentgateway</a> ·
+  part of <a href="https://apievangelist.com/2026/07/01/the-consumer-decides-the-gateway/">The Consumer Decides the Gateway</a></footer>
+</body>
+</html>
